@@ -2,7 +2,7 @@
 import "tailwindcss/tailwind.css";
 
 import type { AppProps } from "next/app";
-import { AuthProvider } from "../firebase/auth";
+import { AuthProvider } from "@/firebase/auth";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

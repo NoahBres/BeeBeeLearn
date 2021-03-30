@@ -1,7 +1,7 @@
-import { firebaseClient } from "../firebase/firebaseClient";
+import { useRouter } from "next/router";
 import firebase from "firebase/app";
 
-import { useRouter } from "next/router";
+import { firebaseClient } from "@/firebase/firebaseClient";
 
 export default function Login() {
   const router = useRouter();

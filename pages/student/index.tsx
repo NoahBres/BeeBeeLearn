@@ -1,7 +1,7 @@
 import nookies from "nookies";
 import { useRouter } from "next/router";
-import { firebaseAdmin } from "../../firebase/firebaseAdmin";
-import { firebaseClient } from "../../firebase/firebaseClient";
+import { firebaseAdmin } from "@/firebase/firebaseAdmin";
+import { firebaseClient } from "@/firebase/firebaseClient";
 
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next";
 
