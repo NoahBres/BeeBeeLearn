@@ -12,7 +12,7 @@ export async function getUser(id: string): Promise<User | null> {
           const transformedData = { ...e.data(), id: e.id } as User;
           res(transformedData);
         } else {
-          rej(rej("User does not exist"));
+          rej(rej("Requested user does not exist"));
         }
       })
       .catch((e) => rej(`A problem occured while retrieving user: ${e}`));

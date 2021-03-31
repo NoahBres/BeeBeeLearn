@@ -11,6 +11,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const decodedPayload = Buffer.from(authPayload, "base64").toString();
       const [username, password] = decodedPayload.split(":");
 
+      console.log(req.headers);
+
       if (username.length === 0 || password.length === 0) {
         res.status(400).json({ message: "Empty username or password field" });
       } else {
@@ -34,9 +36,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             }
           } else res.status(401).json({ message: "Invalid Password" });
         } catch (e) {
-          res
-            .status(401)
-            .json({ message: `A problem occured while retrieving user: ${e}` });
+          res.status(401).json({ message: `${e}` });
         }
       }
     } else {
