@@ -2,23 +2,20 @@ import nookies from "nookies";
 import { useRouter } from "next/router";
 import { firebaseAdmin } from "@/firebase/firebaseAdmin";
 import { firebaseClient } from "@/firebase/firebaseClient";
+import { getUser } from "@/firebase/query";
 
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next";
+import { UserBare } from "@/firebase/types";
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   try {
     const cookies = nookies.get(ctx);
-    console.log(JSON.stringify(cookies, null, 2));
     const token = await firebaseAdmin.auth().verifyIdToken(cookies.token);
-    const { uid, email } = token;
 
-    // the user is authenticated!
-    // FETCH STUFF HERE
-
-    console.log(token);
+    const user = (await getUser(token.uid)) as UserBare;
 
     return {
-      props: { message: `Your email is ${email} and your UID is ${uid}.` },
+      props: { user },
     };
   } catch (err) {
     // either the `token` cookie didn't exist
@@ -44,7 +41,10 @@ const StudentHome = (
   return (
     <div>
       <h1>Student Home</h1>
-      <p>{props.message}</p>
+      <p>{props.user.name}</p>
+      <p>{props.user.id}</p>
+      <p>{props.user.role}</p>
+      {/* <p>{props.message}</p> */}
     </div>
   );
 };

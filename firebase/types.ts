@@ -6,3 +6,6 @@ export type User = {
   uid?: string;
   id: string;
 };
+
+// Stripped down user type
+export type UserBare = Required<Pick<User, "name" | "role" | "id">>;

@@ -34,7 +34,7 @@ export default function Login() {
               .auth()
               .signInWithCustomToken(data["token"])
               .then(() => router.push("/student"))
-              .catch((e) => console.log(e));
+              .catch((e) => console.log(`Error: ${e}`));
           });
         } else if (response.status === 401) {
           response.json().then((data) => console.log(data["message"]));
