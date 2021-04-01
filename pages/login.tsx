@@ -1,8 +1,6 @@
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 
 import { useRouter } from "next/router";
-import firebase from "firebase/app";
-import { LockClosedIcon } from "@heroicons/react/outline";
 
 import { firebaseClient } from "@/firebase/firebaseClient";
 
@@ -16,7 +14,7 @@ export default function Login() {
   const [inputUsername, setInputUsername] = useState("");
   const [inputPassword, setInputPassword] = useState("");
 
-  const signInWithPassword = async (e) => {
+  const signInWithPassword = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     fetch("/api/login", {
@@ -46,24 +44,14 @@ export default function Login() {
     // firebaseClient.auth().
   };
 
-  const signInWithGoogle = () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-
-    firebaseClient
-      .auth()
-      .signInWithPopup(provider)
-      .then(() => router.push("/student"))
-      .catch((e) => console.log(e));
-  };
-
   return (
     <div
-      className="w-full min-h-screen bg-yellow-200 flex items-center justify-center"
+      className="flex items-center justify-center w-full min-h-screen bg-yellow-200"
       style={{ backgroundImage: `url("${BG_SVG}")` }}
     >
-      <main className="bg-white shadow-md rounded-lg px-12 py-10 pt-0">
+      <main className="px-12 py-10 pt-0 bg-white rounded-lg shadow-md">
         <h1
-          className="text-7xl font-black tracking-tight lowercase text-center text-yellow-500 transform -translate-y-10"
+          className="font-black tracking-tight text-center text-yellow-500 lowercase transform -translate-y-10 text-7xl"
           style={{ WebkitTextStroke: "2.5px #B45309" }}
         >
           Log In
@@ -86,21 +74,12 @@ export default function Login() {
             onChange={(e) => setInputPassword(e.target.value)}
           />
           <button
-            className="btn-yellow inline-block"
+            className="inline-block btn-yellow"
             onClick={signInWithPassword}
           >
             sign in
           </button>
         </form>
-        <div className="w-10 border-t border-gray-300 m-auto h-1 mt-3 mb-3" />
-        <button className="btn-yellow" onClick={signInWithGoogle}>
-          <img
-            src="icons/google-logo.svg"
-            className="w-5 h-5 mr-2"
-            draggable={false}
-          />
-          sign in with Google
-        </button>
       </main>
     </div>
   );
