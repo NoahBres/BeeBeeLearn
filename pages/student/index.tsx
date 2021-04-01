@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import nookies from "nookies";
+import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next";
+
 import { firebaseAdmin } from "@/firebase/firebaseAdmin";
 import { firebaseClient } from "@/firebase/firebaseClient";
-import { getUser } from "@/firebase/query";
-
-import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next";
-import { UserBare } from "@/firebase/types";
+import { getChat, getUser } from "@/firebase/query";
+import { Chat, User } from "@/firebase/types";
 
 import { PaperAirplaneIcon } from "@heroicons/react/solid";
 
@@ -15,10 +15,26 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     const cookies = nookies.get(ctx);
     const token = await firebaseAdmin.auth().verifyIdToken(cookies.token);
 
-    const user = (await getUser(token.uid)) as UserBare;
+    // We don't want unnecessary properties in the type e.g. password so strip them
+    const dbUser = await getUser(token.uid);
+    const user = {
+      name: dbUser.name,
+      role: dbUser.role,
+      id: dbUser.id,
+    };
+
+    const botChat = dbUser.chats.find((e) => {
+      return (
+        e.participants.length === 2 &&
+        e.participants.includes("bot") &&
+        e.participants.includes(user.id)
+      );
+    });
+
+    const chat = botChat ? await getChat(botChat.id) : null;
 
     return {
-      props: { user },
+      props: { user, chat },
     };
   } catch (err) {
     // either the `token` cookie didn't exist
@@ -40,20 +56,15 @@ const BG_SVG_COLOR = "92400E";
 const BG_OPACITY = 0.08;
 const BG_SVG = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23${BG_SVG_COLOR}' fill-opacity='${BG_OPACITY}' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E`;
 
-type Message = {
-  sender: "self" | "bot";
-  message: string;
-};
-
-const StudentHome = (
-  props: InferGetServerSidePropsType<typeof getServerSideProps>
-) => {
-  const [messages, setMessages] = useState<Message[]>([
-    { sender: "self", message: "hi!!!" },
-    { sender: "bot", message: "howdy :))" },
-    { sender: "self", message: "i am timmy 😄" },
-    { sender: "self", message: "how r u today??" },
-  ]);
+const StudentHome = ({
+  user,
+  chat,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [messages, setMessages] = useState(
+    chat.messages.sort(
+      (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()
+    )
+  );
 
   return (
     <div
@@ -61,27 +72,40 @@ const StudentHome = (
       style={{ backgroundImage: `url("${BG_SVG}")` }}
     >
       <div className="flex flex-col w-[40rem] bg-orange-200 flex-grow my-5 rounded-3xl shadow-md border border-yellow-300 overflow-hidden">
-        <header className="px-6 py-5 bg-white border border-gray-200 rounded-3xl">
+        <header className="px-6 py-5 bg-white rounded-3xl">
           <h1 className="text-3xl font-black tracking-wide">
-            Hi, {props.user.name}! 👋
+            Hi, {user.name}! 👋
           </h1>
         </header>
         <div className="flex flex-col flex-grow w-full p-5 space-y-2">
-          {messages.map((e) => {
+          {messages.map((e, i) => {
             if (e.sender === "bot") {
               return (
-                <div className="self-start px-4 py-3 bg-white border border-gray-100 rounded-bl-sm rounded-2xl w-max">
+                <div
+                  className="self-start px-4 py-3 bg-white border border-gray-100 rounded-bl-sm rounded-2xl w-max"
+                  key={i}
+                >
                   {e.message}
                 </div>
               );
-            } else if (e.sender === "self") {
+            } else {
               return (
-                <div className="self-end px-4 py-3 text-white bg-orange-600 border border-transparent rounded-br-sm rounded-2xl w-max">
+                <div
+                  className="self-end px-4 py-3 text-white bg-orange-600 border border-transparent rounded-br-sm rounded-2xl w-max"
+                  key={i}
+                >
                   {e.message}
                 </div>
               );
             }
           })}
+          {messages.length === 0 && (
+            <div className="flex flex-col items-center justify-center flex-grow">
+              <p className="flex items-center text-2xl font-semibold text-center">
+                no messages sent yet <span className="ml-2 text-3xl">🥺</span>
+              </p>
+            </div>
+          )}
         </div>
         <div className="w-full px-3 pb-4">
           <div className="flex items-center w-full transition bg-white border border-orange-300 rounded-full shadow-md h-14 ring ring-transparent focus-within:ring-opacity-50 focus-within:ring-orange-400 focus-within:border-orange-500">
