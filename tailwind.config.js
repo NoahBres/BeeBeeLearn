@@ -16,7 +16,11 @@ module.exports = {
     },
   },
   variants: {
-    extend: {},
+    extend: {
+      backgroundColor: ["disabled"],
+      pointerEvents: ["disabled"],
+    },
   },
+
   plugins: [require("@tailwindcss/forms")],
 };

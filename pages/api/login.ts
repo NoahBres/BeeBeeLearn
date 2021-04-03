@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import { getUser } from "@/firebase/query";
+import { queryUser } from "@/firebase/query";
 import { comparePass } from "@/firebase/password";
 import { firebaseAdmin } from "@/firebase/firebaseAdmin";
 
@@ -17,7 +17,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(400).json({ message: "Empty username or password field" });
       } else {
         try {
-          const user = await getUser(username);
+          const user = await queryUser(username);
 
           const passwordsMatch = await comparePass(
             password ?? "",

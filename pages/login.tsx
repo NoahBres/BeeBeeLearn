@@ -74,6 +74,7 @@ export default function Login() {
             onChange={(e) => setInputPassword(e.target.value)}
           />
           <button
+            type="submit"
             className="inline-block btn-yellow"
             onClick={signInWithPassword}
           >
