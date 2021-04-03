@@ -13,11 +13,13 @@ export type User = {
 };
 
 export type ChatMeta = {
-  participants: string[];
   id: string;
+  participants: string[];
+  secret: string;
 };
 
 export type ChatMessage = {
+  id: string;
   message: string;
   sender: string;
   time: string;

@@ -4,6 +4,7 @@ import { ChatMeta, ChatMessage } from "../types";
 
 type FirebaseChatType = {
   participants: string[];
+  secret: string;
 };
 
 type FirebaseChatMessagesType = {
@@ -14,13 +15,17 @@ type FirebaseChatMessagesType = {
 
 const chatConverter: FirebaseFirestore.FirestoreDataConverter<ChatMeta> = {
   toFirestore(chat: ChatMeta): FirebaseChatType {
-    return { participants: chat.participants };
+    return { participants: chat.participants, secret: chat.secret };
   },
 
   fromFirestore(snapshot: FirebaseFirestore.QueryDocumentSnapshot): ChatMeta {
     const data = snapshot.data() as FirebaseChatType;
 
-    return { id: snapshot.id, participants: data.participants };
+    return {
+      id: snapshot.id,
+      participants: data.participants,
+      secret: data.secret,
+    };
   },
 };
 
@@ -39,6 +44,7 @@ const chatMessagesConverter: FirebaseFirestore.FirestoreDataConverter<ChatMessag
     const data = snapshot.data() as FirebaseChatMessagesType;
 
     return {
+      id: snapshot.id,
       message: data.message,
       sender: data.sender,
       time: data.time.toDate().toISOString(),

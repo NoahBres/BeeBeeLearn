@@ -69,12 +69,9 @@ const StudentHome = ({
     firebaseClient
       .firestore()
       .collection("chats")
-      // TODO: FIX THIS
       .doc(meta.id)
       .collection("messages")
   );
-
-  // const [messages, setMessages] = useState();
 
   const [chatSnapshot, chatLoading, chatError] = useCollectionData(
     chatMessageRef.current.orderBy("time")
@@ -82,12 +79,9 @@ const StudentHome = ({
 
   const [sendMessageInput, setSendMessageInput] = useState("");
 
-  useEffect(() => {
-    if (chatSnapshot) {
-      console.log(chatSnapshot);
-      // setMessages(chatSnapshot.messages);
-    }
-  }, [chatSnapshot]);
+  const [showSecret, setShowSecret] = useState(false);
+
+  const scrollRef = useRef<HTMLSpanElement>();
 
   const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -99,8 +93,14 @@ const StudentHome = ({
     });
 
     setSendMessageInput("");
+    scrollRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
+  useEffect(() => {
+    if (showSecret) navigator.clipboard.writeText(meta.secret);
+  }, [showSecret]);
+
+  // TODO: type this
   const selectedMessages = chatLoading ? messages : chatSnapshot;
 
   return (
@@ -109,13 +109,37 @@ const StudentHome = ({
       style={{ backgroundImage: `url("${BG_SVG}")` }}
     >
       <div className="flex flex-col w-[40rem] h-[90vh] bg-orange-200 flex-grow my-5 rounded-3xl shadow-md border border-yellow-300 overflow-hidden">
-        <header className="px-6 py-5 bg-white rounded-3xl">
+        <header className="flex flex-row items-center justify-between px-6 py-3 bg-white rounded-3xl">
           <h1 className="text-3xl font-black tracking-wide">
-            Hi, {user.name}! 👋
+            Hi, {user.name}! <span className={styles.wave}>👋</span>
           </h1>
+          <div
+            onClick={() => setShowSecret((prev) => !prev)}
+            className="px-3 py-2 transition rounded-md cursor-pointer group"
+          >
+            <p className="text-lg font-semibold leading-tight text-right select-none">
+              secret 🤫
+            </p>
+            <p
+              className={`relative text-lg leading-tight rounded px-2 py-1 select-none ${
+                showSecret
+                  ? "bg-pink-100"
+                  : "bg-gray-300 text-transparent group-hover:bg-gray-400"
+              } transition-colors`}
+            >
+              {meta.secret}
+              <div
+                className={`absolute inset-0 flex items-center justify-center h-full pointer-events-none ${
+                  showSecret ? "text-transparent" : "group-hover:text-black"
+                } transition-colors`}
+              >
+                👀 👀
+              </div>
+            </p>
+          </div>
         </header>
         {selectedMessages.length !== 0 ? (
-          <TransitionGroup className="flex flex-col flex-grow w-full p-5 space-y-2 overflow-y-auto">
+          <TransitionGroup className="flex flex-col flex-grow w-full p-5 px-3 space-y-2 overflow-y-auto">
             {selectedMessages.map((e, i) => {
               if (e.sender === "bot") {
                 return (
@@ -143,6 +167,7 @@ const StudentHome = ({
                 );
               }
             })}
+            <span ref={scrollRef} />
           </TransitionGroup>
         ) : (
           <div className="flex flex-col items-center justify-center flex-grow">
