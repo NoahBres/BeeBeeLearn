@@ -1,5 +1,6 @@
 import firebaseClient from "firebase/app";
 import "firebase/auth";
+import "firebase/firestore";
 
 const CLIENT_CONFIG = {
   apiKey: "AIzaSyD5-yB0aQUj63JOAgU1h5VDpv0LvwAWrYA",
