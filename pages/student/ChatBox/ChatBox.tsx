@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, FormEvent } from "react";
+import { useEffect, useState, useRef, FormEvent, useLayoutEffect } from "react";
 
 import { firebaseClient } from "@/firebase/firebaseClient";
 
@@ -6,6 +6,8 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { PaperAirplaneIcon } from "@heroicons/react/solid";
+
+import Message from "./Message";
 
 import styles from "./ChatBox.module.css";
 
@@ -50,7 +52,7 @@ const ChatBox = ({
     });
 
     setSendMessageInput("");
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    // scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -69,6 +71,10 @@ const ChatBox = ({
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useLayoutEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatSnapshot]);
 
   // TODO: type this
   const selectedMessages = chatLoading ? messages : chatSnapshot;
@@ -108,25 +114,9 @@ const ChatBox = ({
         <TransitionGroup
           className={`flex flex-col flex-grow w-full p-5 px-3 pb-20 space-y-2 overflow-y-auto ${styles.chatMessageContainer}`}
         >
-          {selectedMessages.map((e, i) => {
-            if (e.sender === "bot") {
-              return (
-                <CSSTransition key={i} timeout={150} classNames={{ ...styles }}>
-                  <div className="self-start px-4 py-3 bg-white border border-gray-100 rounded-bl-sm rounded-2xl w-max">
-                    {e.message}
-                  </div>
-                </CSSTransition>
-              );
-            } else {
-              return (
-                <CSSTransition key={i} timeout={150} classNames={{ ...styles }}>
-                  <div className="self-end px-4 py-3 text-white bg-orange-600 border border-transparent rounded-br-sm rounded-2xl w-max">
-                    {e.message}
-                  </div>
-                </CSSTransition>
-              );
-            }
-          })}
+          {selectedMessages.map((e, i) => (
+            <Message key={i} message={e.message} sender={e.sender} />
+          ))}
           <span ref={scrollRef} />
         </TransitionGroup>
       ) : (
