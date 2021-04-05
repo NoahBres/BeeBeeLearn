@@ -161,4 +161,6 @@ const ChatBox = ({
   );
 };
 
+ChatBox.getInitialProps = async ({ req }) => {};
+
 export default ChatBox;
