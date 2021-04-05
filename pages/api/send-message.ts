@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { firebaseAdmin } from "@/firebase/firebaseAdmin";
 
+import { deleteCollection } from "@/firebase/query";
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const reqBody = JSON.parse(req.body);
@@ -29,11 +31,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           .doc("gOKTf8SdhjMg7GzjRYtr")
           .collection("messages");
 
-        await messageRef.add({
-          ...reqBody.message,
-          sender: decodedToken.uid,
-          time: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
-        });
+        if (reqBody.message.message === "/clear") {
+          await deleteCollection(firebaseAdmin.firestore(), messageRef);
+        } else {
+          await messageRef.add({
+            ...reqBody.message,
+            sender: decodedToken.uid,
+            time: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+          });
+        }
 
         res.status(200).end();
       } catch (err) {
