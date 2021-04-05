@@ -7,7 +7,7 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { PaperAirplaneIcon } from "@heroicons/react/solid";
 
-import styles from "./Student.module.css";
+import styles from "./ChatBox.module.css";
 
 const ChatBox = ({
   user,
@@ -39,14 +39,18 @@ const ChatBox = ({
   const sendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    await chatMessageRef.current.add({
-      message: sendMessageInput,
-      sender: user.id,
-      time: firebaseClient.firestore.FieldValue.serverTimestamp(),
+    fetch("/api/send-message", {
+      method: "POST",
+      body: JSON.stringify({
+        message: {
+          message: sendMessageInput,
+        },
+        chatId: meta.id,
+      }),
     });
 
     setSendMessageInput("");
-    // scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -70,7 +74,7 @@ const ChatBox = ({
   const selectedMessages = chatLoading ? messages : chatSnapshot;
 
   return (
-    <div className="flex flex-col w-[40rem] h-[90vh] bg-orange-200 flex-grow my-5 rounded-3xl shadow-md border border-yellow-300 overflow-hidden">
+    <div className="flex flex-col w-[40rem] h-[90vh] bg-orange-200 flex-grow my-5 rounded-3xl shadow-md border border-yellow-300 overflow-hidden relative">
       <header className="flex flex-row items-center justify-between px-6 py-3 bg-white rounded-3xl">
         <h1 className="text-3xl font-black tracking-wide">
           Hi, {user.name}! <span className={styles.wave}>👋</span>
@@ -102,7 +106,7 @@ const ChatBox = ({
       </header>
       {selectedMessages.length !== 0 ? (
         <TransitionGroup
-          className={`flex flex-col flex-grow w-full p-5 px-3 space-y-2 overflow-y-auto ${styles.chatMessageContainer}`}
+          className={`flex flex-col flex-grow w-full p-5 px-3 pb-20 space-y-2 overflow-y-auto ${styles.chatMessageContainer}`}
         >
           {selectedMessages.map((e, i) => {
             if (e.sender === "bot") {
@@ -133,7 +137,7 @@ const ChatBox = ({
         </div>
       )}
 
-      <div className="w-full px-3 pb-4">
+      <div className="absolute w-full px-3 pb-4" style={{ bottom: "0rem" }}>
         <form
           onSubmit={sendMessage}
           className="flex items-center w-full transition bg-white border border-orange-300 rounded-full shadow-md h-14 ring ring-transparent focus-within:ring-opacity-50 focus-within:ring-orange-400 focus-within:border-orange-500"

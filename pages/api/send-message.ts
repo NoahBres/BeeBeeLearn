@@ -4,19 +4,42 @@ import { firebaseAdmin } from "@/firebase/firebaseAdmin";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
-    const messageRef = firebaseAdmin
-      .firestore()
-      .collection("chats")
-      .doc("gOKTf8SdhjMg7GzjRYtr")
-      .collection("messages");
+    const reqBody = JSON.parse(req.body);
 
-    await messageRef.add({
-      message: req.query.message,
-      sender: "bot",
-      time: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
-    });
+    if (!req.cookies["token"]) {
+      res.status(400).json({ message: "Token missing" });
+    } else if (!reqBody) {
+      res.status(400).json({ message: "Body missing" });
+    } else if (!reqBody["chatId"]) {
+      res.status(400).json({ message: "`chatId` missing" });
+    } else if (!reqBody["message"]) {
+      res.status(400).json({ message: "`message` missing" });
+    } else {
+      try {
+        const decodedToken = await firebaseAdmin
+          .auth()
+          .verifyIdToken(req.cookies["token"]);
 
-    res.status(200).end();
+        // TODO validate role via token
+        // TODO check if message id belongs to the user token
+
+        const messageRef = firebaseAdmin
+          .firestore()
+          .collection("chats")
+          .doc("gOKTf8SdhjMg7GzjRYtr")
+          .collection("messages");
+
+        await messageRef.add({
+          ...reqBody.message,
+          sender: decodedToken.uid,
+          time: firebaseAdmin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        res.status(200).end();
+      } catch (err) {
+        res.status(500).json({ message: err });
+      }
+    }
   } else {
     res
       .status(403)

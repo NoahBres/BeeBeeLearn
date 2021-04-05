@@ -38,6 +38,8 @@
 
 .chatMessageContainer::-webkit-scrollbar-track {
   background: transparent;
+
+  margin-bottom: theme("spacing.20");
 }
 
 .chatMessageContainer::-webkit-scrollbar-thumb {
