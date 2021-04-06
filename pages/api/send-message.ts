@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import { firebaseAdmin } from "@/firebase/firebaseAdmin";
+import firebaseAdmin from "@/firebase/admin";
 
 import { deleteCollection } from "@/firebase/query";
 

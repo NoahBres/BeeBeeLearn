@@ -1,4 +1,4 @@
-import { firebaseAdmin } from "@/firebase/firebaseAdmin";
+import firebaseAdmin from "@/firebase/admin";
 
 import { User } from "../types";
 

@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import firebaseAdmin from "@/firebase/admin";
 import { queryUser } from "@/firebase/query";
 import { comparePass } from "@/firebase/password";
-import { firebaseAdmin } from "@/firebase/firebaseAdmin";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {

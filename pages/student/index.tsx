@@ -2,7 +2,7 @@ import nookies from "nookies";
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next";
 import dynamic from "next/dynamic";
 
-import { firebaseAdmin } from "@/firebase/firebaseAdmin";
+import firebaseAdmin from "@/firebase/admin";
 import { queryChat, queryUser } from "@/firebase/query";
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {

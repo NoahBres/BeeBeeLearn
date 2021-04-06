@@ -1,4 +1,4 @@
-import * as firebaseAdmin from "firebase-admin";
+import admin from "firebase-admin";
 
 const privateKey = process.env["PRIVATE_KEY"];
 const clientEmail = process.env["CLIENT_EMAIL"];
@@ -10,15 +10,24 @@ if (!privateKey || !clientEmail || !projectId) {
   );
 }
 
-if (!firebaseAdmin.apps.length) {
-  firebaseAdmin.initializeApp({
-    credential: firebaseAdmin.credential.cert({
+try {
+  admin.initializeApp({
+    credential: admin.credential.cert({
       privateKey: privateKey,
       clientEmail,
       projectId,
     }),
     databaseURL: `https://${projectId}.firebaseio.com`,
   });
+} catch (error) {
+  /*
+   * We skip the "already exists" message which is
+   * not an actual error when we're hot-reloading.
+   */
+  if (!/already exists/u.test(error.message)) {
+    // eslint-disable-next-line no-console
+    console.error("Firebase admin initialization error", error.stack);
+  }
 }
 
-export { firebaseAdmin };
+export default admin;

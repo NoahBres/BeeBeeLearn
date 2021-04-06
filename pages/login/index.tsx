@@ -2,7 +2,7 @@ import { MouseEvent, useState } from "react";
 
 import { useRouter } from "next/router";
 
-import { firebaseClient } from "@/firebase/firebaseClient";
+import firebaseClient from "@/firebase/client";
 
 import LoadingButton, { LoadingButtonState } from "@/components/LoadingButton";
 
@@ -73,7 +73,6 @@ export default function Login() {
         }
       })
       .catch((err) => console.log(err));
-    // firebaseClient.auth().
   };
 
   const formChange = () => {

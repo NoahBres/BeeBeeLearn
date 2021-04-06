@@ -1,10 +1,10 @@
 import nookies from "nookies";
 
 import { useRouter } from "next/router";
-import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next";
+import { GetServerSidePropsContext } from "next";
 
-import { firebaseAdmin } from "@/firebase/firebaseAdmin";
-import { firebaseClient } from "@/firebase/firebaseClient";
+import firebaseAdmin from "@/firebase/admin";
+import firebaseClient from "@/firebase/client";
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   try {

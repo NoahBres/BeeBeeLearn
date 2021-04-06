@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef, FormEvent, useLayoutEffect } from "react";
 
-import { firebaseClient } from "@/firebase/firebaseClient";
+import firebaseClient from "@/firebase/client";
 
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
-import { TransitionGroup, CSSTransition } from "react-transition-group";
+import { TransitionGroup } from "react-transition-group";
 import { PaperAirplaneIcon } from "@heroicons/react/solid";
 
 import Message from "./Message";
@@ -21,11 +21,7 @@ const ChatBox = ({
   messages: any;
 }) => {
   const chatMessageRef = useRef(
-    firebaseClient
-      .firestore()
-      .collection("chats")
-      .doc(meta.id)
-      .collection("messages")
+    firebaseClient.db.collection("chats").doc(meta.id).collection("messages")
   );
 
   const [chatSnapshot, chatLoading, chatError] = useCollectionData(
@@ -92,7 +88,7 @@ const ChatBox = ({
           <p className="text-lg font-semibold leading-tight text-right select-none">
             secret 🤫
           </p>
-          <p
+          <div
             className={`relative text-lg leading-tight rounded px-2 py-1 select-none ${
               showSecret
                 ? "bg-pink-100"
@@ -107,7 +103,7 @@ const ChatBox = ({
             >
               👀 👀
             </div>
-          </p>
+          </div>
         </div>
       </header>
       {selectedMessages.length !== 0 ? (
